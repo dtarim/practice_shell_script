@@ -1,0 +1,20 @@
+name: Check Branch Positions
+
+on:
+  push:
+    branches:
+      - master
+      - development
+      - main
+
+jobs:
+  check-branches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run branch check script
+        run: |
+          chmod +x shell_deneme
+          ./shell_deneme
