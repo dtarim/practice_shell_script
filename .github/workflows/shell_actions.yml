@@ -19,12 +19,35 @@ jobs:
           chmod +x shell_deneme
           ./shell_deneme
           
-      - name: Check if master is ahead of development
+      - name: Check if main is ahead of master
+        id: check_branches
         run: |
-          MASTER_COMMIT=$(git rev-parse master)
-          MAIN_COMMIT=$(git rev-parse main)
-          if [ "$(git rev-list --count $MASTER_COMMIT..$MAIN_COMMIT)" -gt 0 ]; then
-            echo "main is ahead of master"
+          # Get the commit hashes for both branches
+          MAIN_COMMIT=$(git rev-parse origin/main)
+          MASTER_COMMIT=$(git rev-parse origin/master)
+          
+          # Find the common ancestor commit of both branches
+          COMMON_ANCESTOR=$(git merge-base origin/main origin/master)
+
+          # Get the number of commits that are ahead in 'main' compared to 'master'
+          AHEAD_COUNT=$(git rev-list --count $COMMON_ANCESTOR..$MAIN_COMMIT)
+
+          echo "main branch is ahead by $AHEAD_COUNT commits"
+
+          if [ $AHEAD_COUNT -gt 0 ]; then
+            echo "Main is ahead of master. Creating a pull request."
+            echo "main-ahead=true" >> $GITHUB_ENV
           else
-            echo "master is ahead of main"
+            echo "Main is not ahead of master. No need to create a PR."
+            echo "main-ahead=false" >> $GITHUB_ENV
           fi
+
+      - name: Create Pull Request if Main is ahead
+        if: env.main-ahead == 'true'
+        uses: peter-evans/create-pull-request@v3
+        with:
+          title: "Update master with changes from main"
+          body: "This PR updates the master branch with the latest changes from main."
+          base: master
+          head: main
+          maintainer-review: true
