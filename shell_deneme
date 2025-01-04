@@ -1,0 +1,13 @@
+#!/bin/bash
+
+MASTER="master"
+DEVELOPMENT="development"
+
+git fetch
+
+
+if [ "$(git rev-parse $MASTER)" = "$(git merge-base $MASTER $DEVELOPMENT)" ]; then
+  echo "$DEVELOPMENT branch is ahead or even with $MASTER"
+else
+  echo "$MASTER branch is ahead of $DEVELOPMENT"
+fi
