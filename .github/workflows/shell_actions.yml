@@ -18,3 +18,13 @@ jobs:
         run: |
           chmod +x shell_deneme
           ./shell_deneme
+          
+      - name: Check if master is ahead of development
+        run: |
+          MASTER_COMMIT=$(git rev-parse master)
+          MAIN_COMMIT=$(git rev-parse main)
+          if [ "$(git rev-list --count $MASTER_COMMIT..$MAIN_COMMIT)" -gt 0 ]; then
+            echo "main is ahead of master"
+          else
+            echo "master is ahead of main"
+          fi
