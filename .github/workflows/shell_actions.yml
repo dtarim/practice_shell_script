@@ -1,24 +1,25 @@
-name: Check Branch Positions
+name: Check if Main is Ahead and Create PR
 
 on:
   push:
     branches:
-      - master
-      - development
       - main
+      - master
 
 jobs:
-  check-branches:
+  check-main-ahead:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Tam commit geçmişini çekmek için fetch-depth: 0 ekliyoruz
 
-      - name: Run branch check script
+      - name: Fetch all branches
         run: |
-          chmod +x shell_deneme
-          ./shell_deneme
-          
+          git fetch --all  # Bütün branch'leri çekiyoruz
+
       - name: Check if main is ahead of master
         id: check_branches
         run: |
